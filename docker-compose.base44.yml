@@ -1,0 +1,23 @@
+# Base44 development environment for the KTM (Koosha Tavan Motor) static site.
+#
+# The repository is a plain static website (HTML + CSS + JS + images) with no
+# build step, so the app is served straight from the bind-mounted source. Any
+# edit to a file on disk is visible on the next request — no rebuild needed.
+#
+# Start with:
+#   docker compose -f docker-compose.base44.yml up -d --build
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+      - ./docker/nginx.base44.conf:/etc/nginx/nginx.conf:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: on-failure
